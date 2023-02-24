@@ -12,6 +12,15 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+// app.use((req, res, next) => {
+//   const auth = req.headers.authorization;
+//   if (auth === "secret key") {
+//     next();
+//   } else {
+//     res.status(401).send("Forbidden");
+//   }
+// });
+
 app.get('/', (req, res) => {
   res.redirect("/store");
 });
@@ -49,18 +58,22 @@ app.get('/api/getAll', (req, res) => {
 });
 
 app.post('/api/create', async (req, res) => {
-  const { body } = req;
+  const body = req.body;
   const newItem = {
     id: Date.now(),
-    text: body.text,
-    title: body.title,
+    article: body.article,
+    brand: body.brand,
+    image: body.image,
+    description: body.description,
+    price: body.price,
+    presence: body.presence,
   };
   await fs.readFile(path.join(__dirname, 'database'), 'utf8',async (err, json) => {
     const data = JSON.parse(json);
     data.push(newItem);
     await fs.writeFile(path.join(__dirname, 'database'), JSON.stringify(data), () => {});
     setTimeout(() => {
-      res.send("Ok");
+      res.status(201).send("Ok");
     }, SERVER_LAG);
   });
 });
